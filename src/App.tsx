@@ -1,112 +1,51 @@
 import { useMemo, useState } from 'react'
-import {
-  Activity, ArrowLeft, Calculator, Check, ChevronRight, Copy, FileJson,
-  KeyRound, Menu, Network, Search, ShieldCheck, Sparkles, Terminal,
-  Wifi, X, Zap
-} from 'lucide-react'
+import { ArrowLeft, Check, ChevronRight, Copy, FileJson, Globe, Hash, KeyRound, Menu, Network, Search, ShieldCheck, Terminal, Wifi, X, Zap } from 'lucide-react'
 
-type ToolId = 'home' | 'subnet' | 'password' | 'json' | 'port'
+type ToolId = 'home'|'subnet'|'password'|'json'|'port'|'dns'|'ipconvert'|'hash'|'base64'|'jwt'|'headers'|'powershell'|'linux'|'mac'|'ipv6'
 
-const tools = [
-  { id:'subnet' as ToolId, name:'Calculadora IPv4 / CIDR', desc:'Descubra rede, broadcast, hosts e máscara.', cat:'Redes', icon:Network },
-  { id:'password' as ToolId, name:'Gerador de senhas', desc:'Crie senhas fortes e personalizáveis.', cat:'Segurança', icon:KeyRound },
-  { id:'json' as ToolId, name:'JSON Formatter', desc:'Formate e valide JSON rapidamente.', cat:'Desenvolvimento', icon:FileJson },
-  { id:'port' as ToolId, name:'Port Checker', desc:'Valide uma porta e veja como testar conectividade.', cat:'Redes', icon:Wifi },
+type Tool = { id:ToolId; name:string; desc:string; cat:string; icon:any }
+const tools:Tool[] = [
+ {id:'subnet',name:'Calculadora IPv4 / CIDR',desc:'Descubra rede, broadcast, hosts e máscara.',cat:'Redes',icon:Network},
+ {id:'password',name:'Gerador de senhas',desc:'Crie senhas fortes e personalizáveis.',cat:'Segurança',icon:KeyRound},
+ {id:'json',name:'JSON Formatter',desc:'Formate e valide JSON rapidamente.',cat:'Desenvolvimento',icon:FileJson},
+ {id:'port',name:'Port Checker',desc:'Gere comandos para testar conectividade TCP.',cat:'Redes',icon:Wifi},
+ {id:'dns',name:'DNS Lookup',desc:'Consulte registros DNS usando DNS-over-HTTPS.',cat:'Redes',icon:Globe},
+ {id:'ipconvert',name:'Conversor de IP',desc:'Converta IPv4 entre decimal, binário e hexadecimal.',cat:'Redes',icon:Network},
+ {id:'hash',name:'Gerador de Hash',desc:'Gere SHA-256, SHA-384 e SHA-512 localmente.',cat:'Segurança',icon:Hash},
+ {id:'base64',name:'Base64 Encoder / Decoder',desc:'Codifique e decodifique texto em Base64.',cat:'Desenvolvimento',icon:FileJson},
+ {id:'jwt',name:'JWT Decoder',desc:'Decodifique header e payload de tokens JWT.',cat:'Desenvolvimento',icon:KeyRound},
+ {id:'headers',name:'HTTP Headers Checker',desc:'Consulte cabeçalhos HTTP quando o servidor permitir CORS.',cat:'Web',icon:Globe},
+ {id:'powershell',name:'Gerador PowerShell',desc:'Gere comandos comuns para suporte Windows.',cat:'Windows',icon:Terminal},
+ {id:'linux',name:'Gerador de comandos Linux',desc:'Monte comandos rápidos para administração Linux.',cat:'Linux',icon:Terminal},
+ {id:'mac',name:'MAC Address Lookup',desc:'Consulte fabricante de um endereço MAC.',cat:'Redes',icon:Wifi},
+ {id:'ipv6',name:'Calculadora IPv6 / CIDR',desc:'Calcule prefixo, rede e intervalo IPv6.',cat:'Redes',icon:Network},
 ]
 
-function App() {
-  const [active, setActive] = useState<ToolId>('home')
-  const [query, setQuery] = useState('')
-  const [mobile, setMobile] = useState(false)
-
-  const filtered = useMemo(() => tools.filter(t =>
-    `${t.name} ${t.desc} ${t.cat}`.toLowerCase().includes(query.toLowerCase())
-  ), [query])
-
-  const navigate = (id: ToolId) => { setActive(id); setMobile(false); window.scrollTo({top:0,behavior:'smooth'}) }
-
-  return <div className="app">
-    <header className="topbar">
-      <button className="brand" onClick={()=>navigate('home')}><span className="brand-mark"><Zap size={19}/></span><span>IT<span className="accent">Toolkit</span></span></button>
-      <nav className={mobile ? 'nav open':'nav'}>
-        <button className={active==='home'?'active':''} onClick={()=>navigate('home')}>Início</button>
-        <a href="#ferramentas" onClick={()=>setMobile(false)}>Ferramentas</a>
-        <a href="#pro" onClick={()=>setMobile(false)}>PRO</a>
-      </nav>
-      <button className="mobile-btn" onClick={()=>setMobile(!mobile)}>{mobile?<X/>:<Menu/>}</button>
-    </header>
-
-    <main>
-      {active === 'home' ? <Home query={query} setQuery={setQuery} tools={filtered} navigate={navigate}/> : <ToolPage id={active} back={()=>navigate('home')}/>}
-    </main>
-
-    <footer><div><span className="brand-mini"><Zap size={15}/> ITToolkit</span><span>Ferramentas rápidas para quem trabalha com TI.</span></div><span>© 2026 IT Toolkit</span></footer>
-  </div>
+function App(){
+ const [active,setActive]=useState<ToolId>('home'),[query,setQuery]=useState(''),[mobile,setMobile]=useState(false)
+ const filtered=useMemo(()=>tools.filter(t=>`${t.name} ${t.desc} ${t.cat}`.toLowerCase().includes(query.toLowerCase())),[query])
+ const navigate=(id:ToolId)=>{setActive(id);setMobile(false);window.scrollTo({top:0,behavior:'smooth'})}
+ return <div className="app"><header className="topbar"><button className="brand" onClick={()=>navigate('home')}><span className="brand-mark"><Zap size={19}/></span><span>IT<span className="accent">Toolkit</span></span></button><nav className={mobile?'nav open':'nav'}><button className={active==='home'?'active':''} onClick={()=>navigate('home')}>Início</button><a href="#ferramentas" onClick={()=>setMobile(false)}>Ferramentas</a><a href="#pro" onClick={()=>setMobile(false)}>PRO</a></nav><button className="mobile-btn" onClick={()=>setMobile(!mobile)}>{mobile?<X/>:<Menu/>}</button></header><main>{active==='home'?<Home query={query} setQuery={setQuery} list={filtered} navigate={navigate}/>:<ToolPage id={active} back={()=>navigate('home')}/>}</main><footer><div><span className="brand-mini"><Zap size={15}/> ITToolkit</span><span>Ferramentas rápidas para quem trabalha com TI.</span></div><span>© 2026 IT Toolkit</span></footer></div>
 }
-
-function Home({query,setQuery,tools,navigate}:{query:string,setQuery:(v:string)=>void,tools:any[],navigate:(id:ToolId)=>void}) {
-  return <>
-    <section className="hero">
-      <div className="eyebrow"><Sparkles size={15}/> TOOLKIT PARA PROFISSIONAIS DE TI</div>
-      <h1>Resolva tarefas de TI<br/><span>em poucos segundos.</span></h1>
-      <p>Uma coleção de ferramentas práticas para redes, segurança, desenvolvimento e infraestrutura. Rápidas, gratuitas e sem complicação.</p>
-      <div className="search"><Search size={20}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar uma ferramenta..." /><kbd>⌘ K</kbd></div>
-      <div className="quick"><span><Check size={14}/> Gratuito</span><span><Check size={14}/> Sem cadastro</span><span><Check size={14}/> Processamento local</span></div>
-    </section>
-
-    <section id="ferramentas" className="section">
-      <div className="section-head"><div><span className="eyebrow small">FERRAMENTAS</span><h2>Escolha uma ferramenta</h2></div><span className="count">{tools.length} disponíveis</span></div>
-      <div className="tool-grid">
-        {tools.map((t:any)=><button className="tool-card" key={t.id} onClick={()=>navigate(t.id)}>
-          <div className="icon-box"><t.icon size={22}/></div><div className="tool-text"><span className="tag">{t.cat}</span><h3>{t.name}</h3><p>{t.desc}</p></div><ChevronRight className="arrow" size={19}/>
-        </button>)}
-        {!tools.length && <div className="empty">Nenhuma ferramenta encontrada.</div>}
-      </div>
-    </section>
-
-    <section className="pro" id="pro">
-      <div className="pro-glow"></div>
-      <div className="pro-content"><span className="eyebrow pro-eye"><ShieldCheck size={15}/> EM BREVE</span><h2>IT Toolkit <span>PRO</span></h2><p>Recursos avançados para quem trabalha com TI todos os dias.</p>
-        <div className="pro-list"><span><Check/> Geradores avançados de PowerShell</span><span><Check/> Templates Zabbix</span><span><Check/> Exportação de documentação em PDF</span><span><Check/> Pacotes de scripts para Windows e Linux</span></div>
-      </div>
-      <div className="pro-card"><Sparkles size={28}/><strong>R$ 19,90</strong><span>/ mês (futuramente)</span><button disabled>Entrar na lista de espera</button></div>
-    </section>
-  </>
-}
-
-function ToolPage({id,back}:{id:Exclude<ToolId,'home'>,back:()=>void}) {
-  const data:any = {subnet:['Calculadora IPv4 / CIDR','Redes',Network],password:['Gerador de senhas','Segurança',KeyRound],json:['JSON Formatter','Desenvolvimento',FileJson],port:['Port Checker','Redes',Wifi]}[id]
-  const Icon=data[2]
-  return <section className="tool-page"><button className="back" onClick={back}><ArrowLeft size={17}/> Voltar</button><div className="tool-title"><div className="icon-box big"><Icon/></div><div><span className="tag">{data[1]}</span><h1>{data[0]}</h1></div></div>{id==='subnet'?<Subnet/>:id==='password'?<Password/>:id==='json'?<JsonTool/>:<PortTool/>}</section>
-}
-
-function Subnet() {
-  const [cidr,setCidr]=useState('192.168.1.0/24')
-  const result=useMemo(()=>calcCIDR(cidr),[cidr])
-  return <div className="panel"><label>Endereço IPv4 / CIDR<input value={cidr} onChange={e=>setCidr(e.target.value)} placeholder="192.168.1.0/24"/></label>{result?<div className="result-grid">{Object.entries(result).map(([k,v])=><div className="result" key={k}><span>{k}</span><strong>{v as string}</strong></div>)}</div>:<div className="error">Informe um CIDR válido, por exemplo 192.168.1.0/24.</div>}</div>
-}
-function calcCIDR(value:string) {
-  const m=value.trim().match(/^(\d{1,3}(?:\.\d{1,3}){3})\/(\d{1,2})$/); if(!m)return null
-  const oct=m[1].split('.').map(Number), p=Number(m[2]); if(oct.some(n=>n>255)||p<0||p>32)return null
-  const ip=oct.reduce((a,n)=>(a<<8)+n,0)>>>0
-  const mask=p===0?0:(0xffffffff << (32-p))>>>0, net=(ip&mask)>>>0, broadcast=(net|(~mask>>>0))>>>0
-  const fmt=(n:number)=>[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.')
-  const hosts=p>=31?Math.max(0,2**(32-p)):(2**(32-p)-2)
-  return {'Rede':fmt(net),'Broadcast':fmt(broadcast),'Máscara':fmt(mask),'Prefixo':`/${p}`,'Hosts utilizáveis':String(hosts),'Primeiro host':p<31?fmt(net+1):'—','Último host':p<31?fmt(broadcast-1):'—'}
-}
-function Password() {
-  const [len,setLen]=useState(18), [upper,setUpper]=useState(true), [numbers,setNumbers]=useState(true), [symbols,setSymbols]=useState(true), [value,setValue]=useState('')
-  const generate=()=>{let chars='abcdefghijklmnopqrstuvwxyz';if(upper)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';if(numbers)chars+='0123456789';if(symbols)chars+='!@#$%&*_-+=?';let out='';for(let i=0;i<len;i++)out+=chars[Math.floor(Math.random()*chars.length)];setValue(out)}
-  return <div className="panel"><div className="password-output"><code>{value||'Clique em gerar para criar uma senha'}</code>{value&&<CopyButton text={value}/>}</div><div className="range"><label>Tamanho: <b>{len}</b></label><input type="range" min="8" max="64" value={len} onChange={e=>setLen(Number(e.target.value))}/></div><div className="checks"><label><input type="checkbox" checked={upper} onChange={e=>setUpper(e.target.checked)}/> Maiúsculas</label><label><input type="checkbox" checked={numbers} onChange={e=>setNumbers(e.target.checked)}/> Números</label><label><input type="checkbox" checked={symbols} onChange={e=>setSymbols(e.target.checked)}/> Símbolos</label></div><button className="primary" onClick={generate}><KeyRound size={17}/> Gerar senha</button></div>
-}
-function CopyButton({text}:{text:string}) { const [ok,setOk]=useState(false); return <button className="copy" onClick={()=>{navigator.clipboard.writeText(text);setOk(true);setTimeout(()=>setOk(false),1200)}}>{ok?<Check size={17}/>:<Copy size={17}/>}</button> }
-function JsonTool() {
-  const [text,setText]=useState('{"servidor":"srv01","status":"online","portas":[80,443]}'),[out,setOut]=useState(''),[err,setErr]=useState('')
-  const format=()=>{try{setOut(JSON.stringify(JSON.parse(text),null,2));setErr('')}catch(e){setOut('');setErr('JSON inválido. Verifique vírgulas, aspas e chaves.')}}
-  return <div className="panel"><div className="json-grid"><textarea value={text} onChange={e=>setText(e.target.value)} spellCheck={false}/><div className="json-out">{out?<pre>{out}</pre>:<span>Resultado aparecerá aqui.</span>}</div></div>{err&&<div className="error">{err}</div>}<div className="actions"><button className="primary" onClick={format}><FileJson size={17}/> Formatar e validar</button>{out&&<CopyButton text={out}/>}</div></div>
-}
-function PortTool() {
-  const [host,setHost]=useState('example.com'),[port,setPort]=useState('443')
-  return <div className="panel"><div className="notice"><Activity size={20}/><div><strong>Limitação do navegador</strong><p>Uma página web não consegue realizar uma verificação TCP arbitrária de portas como o <code>nc</code>. Use os dados abaixo com uma ferramenta local.</p></div></div><div className="two"><label>Host<input value={host} onChange={e=>setHost(e.target.value)}/></label><label>Porta<input type="number" value={port} onChange={e=>setPort(e.target.value)}/></label></div><div className="terminal"><Terminal size={17}/><code>nc -vz {host || 'host'} {port || 'porta'}</code></div><p className="muted">Linux/macOS: execute no terminal. Windows: <code>Test-NetConnection {host || 'host'} -Port {port || 'porta'}</code></p></div>
-}
+function Home({query,setQuery,list,navigate}:{query:string,setQuery:(v:string)=>void,list:Tool[],navigate:(id:ToolId)=>void}){return <><section className="hero"><div className="eyebrow"><Zap size={15}/> TOOLKIT PARA PROFISSIONAIS DE TI</div><h1>Resolva tarefas de TI<br/><span>em poucos segundos.</span></h1><p>Uma coleção de ferramentas práticas para redes, segurança, desenvolvimento e infraestrutura. Rápidas, gratuitas e sem complicação.</p><div className="search"><Search size={20}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar uma ferramenta..."/><kbd>⌘ K</kbd></div><div className="quick"><span><Check size={14}/> Gratuito</span><span><Check size={14}/> Sem cadastro</span><span><Check size={14}/> Processamento local</span></div></section><section id="ferramentas" className="section"><div className="section-head"><div><span className="eyebrow small">FERRAMENTAS</span><h2>Escolha uma ferramenta</h2></div><span className="count">{list.length} disponíveis</span></div><div className="tool-grid">{list.map(t=><button className="tool-card" key={t.id} onClick={()=>navigate(t.id)}><div className="icon-box"><t.icon size={22}/></div><div className="tool-text"><span className="tag">{t.cat}</span><h3>{t.name}</h3><p>{t.desc}</p></div><ChevronRight className="arrow" size={19}/></button>)}{!list.length&&<div className="empty">Nenhuma ferramenta encontrada.</div>}</div></section><section className="pro" id="pro"><div className="pro-glow"></div><div className="pro-content"><span className="eyebrow pro-eye"><ShieldCheck size={15}/> EM BREVE</span><h2>IT Toolkit <span>PRO</span></h2><p>Recursos avançados para quem trabalha com TI todos os dias.</p><div className="pro-list"><span><Check/> Geradores avançados de PowerShell</span><span><Check/> Templates Zabbix</span><span><Check/> Exportação de documentação em PDF</span><span><Check/> Pacotes de scripts para Windows e Linux</span></div></div><div className="pro-card"><strong>R$ 19,90</strong><span>/ mês (futuramente)</span><button disabled>Entrar na lista de espera</button></div></section></>}
+function ToolPage({id,back}:{id:Exclude<ToolId,'home'>,back:()=>void}){const t=tools.find(x=>x.id===id)!;const Icon=t.icon;return <section className="tool-page"><button className="back" onClick={back}><ArrowLeft size={17}/> Voltar</button><div className="tool-title"><div className="icon-box big"><Icon/></div><div><span className="tag">{t.cat}</span><h1>{t.name}</h1><p>{t.desc}</p></div></div>{id==='subnet'?<Subnet/>:id==='password'?<Password/>:id==='json'?<JsonTool/>:id==='port'?<PortTool/>:id==='dns'?<DnsTool/>:id==='ipconvert'?<IpConvert/>:id==='hash'?<HashTool/>:id==='base64'?<Base64Tool/>:id==='jwt'?<JwtTool/>:id==='headers'?<HeadersTool/>:id==='powershell'?<PowerShell/>:id==='linux'?<LinuxTool/>:id==='mac'?<MacLookup/>:<IPv6Tool/>}</section>}
+function Panel({children}:{children:any}){return <div className="panel">{children}</div>}
+function CopyButton({text}:{text:string}){const[ok,setOk]=useState(false);return <button className="copy" onClick={()=>{navigator.clipboard.writeText(text);setOk(true);setTimeout(()=>setOk(false),1200)}}>{ok?<Check size={17}/>:<Copy size={17}/>}</button>}
+function Subnet(){const[cidr,setCidr]=useState('192.168.1.0/24');const r=useMemo(()=>calcCIDR(cidr),[cidr]);return <Panel><label>Endereço IPv4 / CIDR<input value={cidr} onChange={e=>setCidr(e.target.value)} placeholder="192.168.1.0/24"/></label>{r?<div className="result-grid">{Object.entries(r).map(([k,v])=><div className="result" key={k}><span>{k}</span><strong>{v}</strong></div>)}</div>:<div className="error">Informe um CIDR válido, por exemplo 192.168.1.0/24.</div>}</Panel>}
+function calcCIDR(v:string){const m=v.trim().match(/^(\d{1,3}(?:\.\d{1,3}){3})\/(\d{1,2})$/);if(!m)return null;const o=m[1].split('.').map(Number),p=+m[2];if(o.some(n=>n>255)||p>32)return null;const ip=o.reduce((a,n)=>(a<<8)+n,0)>>>0,mask=p===0?0:(0xffffffff<<(32-p))>>>0,net=(ip&mask)>>>0,b=(net|(~mask>>>0))>>>0,fmt=(n:number)=>[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');return{Rede:fmt(net),Broadcast:fmt(b),Máscara:fmt(mask),Prefixo:`/${p}`,'Hosts utilizáveis':String(p>=31?2**(32-p):2**(32-p)-2),'Primeiro host':p<31?fmt(net+1):'—','Último host':p<31?fmt(b-1):'—'}}
+function Password(){const[len,setLen]=useState(18),[upper,setUpper]=useState(true),[numbers,setNumbers]=useState(true),[symbols,setSymbols]=useState(true),[value,setValue]=useState('');const generate=()=>{let c='abcdefghijklmnopqrstuvwxyz';if(upper)c+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';if(numbers)c+='0123456789';if(symbols)c+='!@#$%&*_-+=?';let o='';for(let i=0;i<len;i++)o+=c[Math.floor(Math.random()*c.length)];setValue(o)};return <Panel><div className="password-output"><code>{value||'Clique em gerar para criar uma senha'}</code>{value&&<CopyButton text={value}/>}</div><div className="range"><label>Tamanho: <b>{len}</b></label><input type="range" min="8" max="64" value={len} onChange={e=>setLen(+e.target.value)}/></div><div className="checks"><label><input type="checkbox" checked={upper} onChange={e=>setUpper(e.target.checked)}/> Maiúsculas</label><label><input type="checkbox" checked={numbers} onChange={e=>setNumbers(e.target.checked)}/> Números</label><label><input type="checkbox" checked={symbols} onChange={e=>setSymbols(e.target.checked)}/> Símbolos</label></div><button className="primary" onClick={generate}><KeyRound size={17}/> Gerar senha</button></Panel>}
+function JsonTool(){const[text,setText]=useState('{"servidor":"srv01","status":"online","portas":[80,443]}'),[out,setOut]=useState(''),[err,setErr]=useState('');const format=()=>{try{setOut(JSON.stringify(JSON.parse(text),null,2));setErr('')}catch{setOut('');setErr('JSON inválido. Verifique vírgulas, aspas e chaves.')}};return <Panel><div className="json-grid"><textarea value={text} onChange={e=>setText(e.target.value)} spellCheck={false}/><div className="json-out">{out?<pre>{out}</pre>:<span>Resultado aparecerá aqui.</span>}</div></div>{err&&<div className="error">{err}</div>}<div className="actions"><button className="primary" onClick={format}><FileJson size={17}/> Formatar e validar</button>{out&&<CopyButton text={out}/>}</div></Panel>}
+function PortTool(){const[host,setHost]=useState('example.com'),[port,setPort]=useState('443');return <Panel><div className="notice"><Wifi size={20}/><div><strong>Limitação do navegador</strong><p>Use os comandos abaixo para testar TCP sem depender de APIs externas.</p></div></div><div className="two"><label>Host<input value={host} onChange={e=>setHost(e.target.value)}/></label><label>Porta<input type="number" value={port} onChange={e=>setPort(e.target.value)}/></label></div><Command text={`nc -vz ${host||'host'} ${port||'porta'}`}/><p className="muted">Windows PowerShell: <code>Test-NetConnection {host||'host'} -Port {port||'porta'}</code></p></Panel>}
+function Command({text}:{text:string}){return <div className="terminal"><Terminal size={17}/><code>{text}</code><CopyButton text={text}/></div>}
+function DnsTool(){const[host,setHost]=useState('example.com'),[type,setType]=useState('A'),[out,setOut]=useState<any>(null),[loading,setLoading]=useState(false);const run=async()=>{setLoading(true);try{const r=await fetch(`https://dns.google/resolve?name=${encodeURIComponent(host)}&type=${type}`);setOut(await r.json())}catch{setOut({error:'Não foi possível consultar o DNS.'})}finally{setLoading(false)}};return <Panel><div className="two"><label>Domínio<input value={host} onChange={e=>setHost(e.target.value)}/></label><label>Tipo<select value={type} onChange={e=>setType(e.target.value)}><option>A</option><option>AAAA</option><option>MX</option><option>TXT</option><option>CNAME</option><option>NS</option></select></label></div><button className="primary" onClick={run}>{loading?'Consultando...':'Consultar DNS'}</button>{out&&<pre className="code-result">{JSON.stringify(out,null,2)}</pre>}</Panel>}
+function IpConvert(){const[ip,setIp]=useState('192.168.1.10');const n=ipToNum(ip);return <Panel><label>IPv4<input value={ip} onChange={e=>setIp(e.target.value)}/></label>{n===null?<div className="error">IPv4 inválido.</div>:<div className="result-grid"><div className="result"><span>Decimal</span><strong>{n}</strong></div><div className="result"><span>Binário</span><strong>{n.toString(2).padStart(32,'0').replace(/(.{8})/g,'$1 ').trim()}</strong></div><div className="result"><span>Hexadecimal</span><strong>0x{n.toString(16).padStart(8,'0').toUpperCase()}</strong></div></div>}</Panel>}
+function ipToNum(v:string){const p=v.split('.').map(Number);if(p.length!==4||p.some(n=>!Number.isInteger(n)||n<0||n>255))return null;return p.reduce((a,n)=>a*256+n,0)}
+function HashTool(){const[text,setText]=useState(''),[out,setOut]=useState<Record<string,string>>({});const run=async()=>{const enc=new TextEncoder();const next:Record<string,string>={};for(const alg of ['SHA-256','SHA-384','SHA-512']){const b=await crypto.subtle.digest(alg,enc.encode(text));next[alg]=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}setOut(next)};return <Panel><label>Texto<textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Digite o texto..."/></label><button className="primary" onClick={run}>Gerar hashes</button>{Object.entries(out).map(([k,v])=><div className="terminal" key={k}><strong>{k}</strong><code>{v}</code><CopyButton text={v}/></div>)}</Panel>}
+function Base64Tool(){const[text,setText]=useState(''),[decode,setDecode]=useState(false),[out,setOut]=useState('');const run=()=>{try{setOut(decode?decodeURIComponent(escape(atob(text))):btoa(unescape(encodeURIComponent(text))))}catch{setOut('Entrada Base64 inválida.')}};return <Panel><div className="checks"><label><input type="checkbox" checked={decode} onChange={e=>setDecode(e.target.checked)}/> Decodificar</label></div><textarea value={text} onChange={e=>setText(e.target.value)} placeholder={decode?'Cole o Base64 aqui':'Digite o texto aqui'}/><div className="actions"><button className="primary" onClick={run}>{decode?'Decodificar':'Codificar'}</button>{out&&<CopyButton text={out}/>}</div>{out&&<pre className="code-result">{out}</pre>}</Panel>}
+function JwtTool(){const[token,setToken]=useState(''),[out,setOut]=useState<any>(null);const run=()=>{try{const[p1,p2]=token.split('.');const dec=(s:string)=>JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/')))));setOut({header:dec(p1),payload:dec(p2)})}catch{setOut({error:'JWT inválido ou malformado.'})}};return <Panel><label>Token JWT<textarea value={token} onChange={e=>setToken(e.target.value)} placeholder="eyJhbGciOi..."/></label><button className="primary" onClick={run}>Decodificar JWT</button>{out&&<pre className="code-result">{JSON.stringify(out,null,2)}</pre>}<p className="muted">A ferramenta apenas decodifica o token. Não valida assinatura nem autentica o JWT.</p></Panel>}
+function HeadersTool(){const[url,setUrl]=useState('https://example.com'),[out,setOut]=useState('');const run=async()=>{try{const r=await fetch(url,{method:'HEAD'});setOut([...r.headers.entries()].map(([k,v])=>`${k}: ${v}`).join('\n')||'Nenhum cabeçalho exposto pelo CORS.')}catch{setOut('Falha na consulta. O servidor pode bloquear CORS ou HEAD.')}};return <Panel><label>URL<input value={url} onChange={e=>setUrl(e.target.value)}/></label><button className="primary" onClick={run}>Consultar headers</button>{out&&<pre className="code-result">{out}</pre>}</Panel>}
+function PowerShell(){const[task,setTask]=useState('ip'),[value,setValue]=useState('');const commands:Record<string,string>={ip:'Get-NetIPConfiguration',dns:'Get-DnsClientServerAddress',process:'Get-Process | Sort-Object CPU -Descending | Select-Object -First 20',services:'Get-Service | Where-Object Status -eq Running',disk:'Get-PSDrive -PSProvider FileSystem',users:'Get-LocalUser'};return <Panel><label>Comando<select value={task} onChange={e=>setTask(e.target.value)}><option value="ip">Ver configuração IP</option><option value="dns">Ver servidores DNS</option><option value="process">Top processos por CPU</option><option value="services">Serviços em execução</option><option value="disk">Espaço em discos</option><option value="users">Usuários locais</option></select></label><Command text={value||commands[task]}/><button className="primary" onClick={()=>setValue(commands[task])}>Gerar comando</button></Panel>}
+function LinuxTool(){const[task,setTask]=useState('ip');const commands:Record<string,string>={ip:'ip addr show',ports:'ss -tulpn',disk:'df -h',memory:'free -h',process:'ps aux --sort=-%cpu | head -n 15',logs:'journalctl -p err -b',dns:'resolvectl status'};return <Panel><label>Comando<select value={task} onChange={e=>setTask(e.target.value)}><option value="ip">Interfaces de rede</option><option value="ports">Portas abertas</option><option value="disk">Uso de disco</option><option value="memory">Memória RAM</option><option value="process">Processos por CPU</option><option value="logs">Erros do boot atual</option><option value="dns">Configuração DNS</option></select></label><Command text={commands[task]}/></Panel>}
+function MacLookup(){const[mac,setMac]=useState('00:1A:2B:3C:4D:5E');const url=`https://api.macvendors.com/${encodeURIComponent(mac)}`;return <Panel><label>MAC Address<input value={mac} onChange={e=>setMac(e.target.value)}/></label><div className="notice"><Wifi size={20}/><div><strong>Consulta de fabricante</strong><p>Abra a consulta pública para descobrir o fabricante pelo OUI.</p></div></div><a className="primary link-button" href={url} target="_blank" rel="noreferrer">Consultar fabricante</a><p className="muted">A disponibilidade depende do serviço público de MAC lookup.</p></Panel>}
+function IPv6Tool(){const[value,setValue]=useState('2001:db8::/64');const valid=/^[0-9a-fA-F:]+\/([0-9]{1,3})$/.test(value);const p=Number(value.split('/')[1]);return <Panel><label>IPv6 / CIDR<input value={value} onChange={e=>setValue(e.target.value)} placeholder="2001:db8::/64"/></label>{!valid||p>128?<div className="error">Informe um IPv6/CIDR válido, como 2001:db8::/64.</div>:<div className="result-grid"><div className="result"><span>Prefixo</span><strong>/{p}</strong></div><div className="result"><span>Bits de host</span><strong>{128-p}</strong></div><div className="result"><span>Endereços</span><strong>{p>=128?'1':`2^${128-p}`}</strong></div><div className="result"><span>Rede informada</span><strong>{value.split('/')[0]}</strong></div></div>}<p className="muted">O cálculo de IPv6 aqui mantém o prefixo informado e apresenta a capacidade do bloco.</p></Panel>}
 export default App
