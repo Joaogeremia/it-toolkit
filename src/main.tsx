@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
+import ProPage from './ProPage'
 import './styles.css'
 
 type RouteMeta = { slug: string; name: string; title: string; description: string }
@@ -20,14 +21,10 @@ const routes: RouteMeta[] = [
   { slug: 'gerador-comandos-linux', name: 'Gerador de Comandos Linux', title: 'Gerador de Comandos Linux | IT Toolkit', description: 'Monte comandos Linux rápidos para administração de servidores e suporte técnico.' },
   { slug: 'mac-address-lookup', name: 'MAC Address Lookup', title: 'MAC Address Lookup: Consulte Fabricante | IT Toolkit', description: 'Consulte o fabricante associado a um endereço MAC.' },
   { slug: 'calculadora-ipv6-cidr', name: 'Calculadora IPv6 / CIDR', title: 'Calculadora IPv6 / CIDR Online | IT Toolkit', description: 'Calcule prefixo, rede e intervalo de endereços IPv6 usando CIDR.' },
+  { slug: 'pro', name: 'IT Toolkit PRO', title: 'IT Toolkit PRO — Ferramentas Profissionais para TI | IT Toolkit', description: 'Conheça o IT Toolkit PRO: ferramentas avançadas para suporte, redes, infraestrutura, segurança e desenvolvimento.' },
 ]
 
-const homeMeta: RouteMeta = {
-  slug: '',
-  name: 'IT Toolkit',
-  title: 'IT Toolkit — Ferramentas Online para Profissionais de TI',
-  description: 'Ferramentas rápidas e gratuitas para redes, segurança, Windows, Linux e desenvolvimento.'
-}
+const homeMeta: RouteMeta = { slug: '', name: 'IT Toolkit', title: 'IT Toolkit — Ferramentas Online para Profissionais de TI', description: 'Ferramentas rápidas e gratuitas para redes, segurança, Windows, Linux e desenvolvimento.' }
 
 function getRoute() {
   const path = window.location.pathname.replace(/^\/+|\/+$/g, '')
@@ -38,105 +35,53 @@ function setMeta(route: RouteMeta) {
   document.title = route.title
   const description = document.querySelector<HTMLMetaElement>('meta[name="description"]')
   if (description) description.content = route.description
-
   let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]')
-  if (!robots) {
-    robots = document.createElement('meta')
-    robots.name = 'robots'
-    document.head.appendChild(robots)
-  }
+  if (!robots) { robots = document.createElement('meta'); robots.name = 'robots'; document.head.appendChild(robots) }
   robots.content = 'index,follow'
-
   let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
-  if (!canonical) {
-    canonical = document.createElement('link')
-    canonical.rel = 'canonical'
-    document.head.appendChild(canonical)
-  }
+  if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical) }
   canonical.href = route.slug ? `${window.location.origin}/${route.slug}` : window.location.origin
-
   const setProperty = (property: string, content: string) => {
     let tag = document.querySelector<HTMLMetaElement>(`meta[property="${property}"]`)
-    if (!tag) {
-      tag = document.createElement('meta')
-      tag.setAttribute('property', property)
-      document.head.appendChild(tag)
-    }
+    if (!tag) { tag = document.createElement('meta'); tag.setAttribute('property', property); document.head.appendChild(tag) }
     tag.content = content
   }
   setProperty('og:title', route.title)
   setProperty('og:description', route.description)
   setProperty('og:url', window.location.href)
   setProperty('og:type', 'website')
-
   let schema = document.getElementById('it-toolkit-schema') as HTMLScriptElement | null
-  if (!schema) {
-    schema = document.createElement('script')
-    schema.id = 'it-toolkit-schema'
-    schema.type = 'application/ld+json'
-    document.head.appendChild(schema)
-  }
-  schema.textContent = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: route.name,
-    url: window.location.href,
-    description: route.description,
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Any',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'BRL' }
-  })
+  if (!schema) { schema = document.createElement('script'); schema.id = 'it-toolkit-schema'; schema.type = 'application/ld+json'; document.head.appendChild(schema) }
+  schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebApplication', name: route.name, url: window.location.href, description: route.description, applicationCategory: 'DeveloperApplication', operatingSystem: 'Any', offers: route.slug === 'pro' ? { '@type': 'Offer', price: '19.90', priceCurrency: 'BRL' } : { '@type': 'Offer', price: '0', priceCurrency: 'BRL' } })
 }
 
 function AppShell() {
   const [path, setPath] = useState(window.location.pathname)
   const route = getRoute()
-
   useEffect(() => {
     const onPopState = () => setPath(window.location.pathname)
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
-
   useEffect(() => {
     setMeta(route)
-
     const onClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement
       const card = target.closest<HTMLElement>('.tool-card')
       const back = target.closest<HTMLElement>('.back')
       const brand = target.closest<HTMLElement>('.brand')
       const navLink = target.closest<HTMLAnchorElement>('a[href="#ferramentas"], a[href="#pro"]')
-
-      if (back || brand || navLink) {
-        event.preventDefault()
-        history.pushState({}, '', '/')
-        setPath('/')
-        return
-      }
-
+      if (back || brand || navLink) { event.preventDefault(); history.pushState({}, '', '/'); setPath('/'); return }
       if (card && card.tagName === 'BUTTON') {
         const name = card.querySelector('h3')?.textContent?.trim()
         const match = routes.find(item => item.name === name)
-        if (match) history.pushState({}, '', `/${match.slug}`)
+        if (match) { event.preventDefault(); history.pushState({}, '', `/${match.slug}`); setPath(`/${match.slug}`) }
       }
     }
-
     document.addEventListener('click', onClick, true)
-
-    if (route.slug) {
-      const card = [...document.querySelectorAll<HTMLButtonElement>('.tool-card')].find(
-        item => item.querySelector('h3')?.textContent?.trim() === route.name
-      )
-      if (card) card.click()
-    }
-
     return () => document.removeEventListener('click', onClick, true)
   }, [path])
-
-  return <App key={path} />
+  return route.slug === 'pro' ? <ProPage /> : <App key={path} />
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode><AppShell /></React.StrictMode>
-)
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AppShell /></React.StrictMode>)
