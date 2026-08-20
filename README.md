@@ -1,6 +1,6 @@
 # IT Toolkit
 
-MVP de uma plataforma de ferramentas rápidas para profissionais de TI.
+Plataforma de ferramentas rápidas para profissionais de TI.
 
 ## Stack
 
@@ -12,10 +12,29 @@ MVP de uma plataforma de ferramentas rápidas para profissionais de TI.
 
 ## Ferramentas
 
-- Calculadora IPv4/CIDR
+### Redes
+- Calculadora IPv4 / CIDR
+- Port Checker
+- DNS Lookup
+- Conversor de IPv4 para decimal, binário e hexadecimal
+- MAC Address Lookup
+- Calculadora IPv6 / CIDR
+
+### Segurança
 - Gerador de senhas
-- JSON Formatter/Validator
-- Port Checker (com limitação explicada do navegador)
+- Gerador de SHA-256, SHA-384 e SHA-512
+
+### Desenvolvimento / Web
+- JSON Formatter / Validator
+- Base64 Encoder / Decoder
+- JWT Decoder
+- HTTP Headers Checker
+
+### Windows / Linux
+- Gerador de comandos PowerShell
+- Gerador de comandos Linux
+
+Todas as ferramentas que não dependem de backend pesado processam os dados localmente no navegador. Consultas de rede dependem das políticas de CORS e dos serviços públicos utilizados.
 
 ## Rodar localmente
 
@@ -33,11 +52,10 @@ npm run build
 npm run preview
 ```
 
-## Próximos passos sugeridos
+## Próximos passos
 
-1. Adicionar ferramentas de DNS, HTTP, Base64 e hash.
-2. Criar backend para funções que exigem rede.
-3. Adicionar autenticação.
-4. Criar planos PRO.
-5. Integrar pagamento.
-6. Publicar na Vercel/Cloudflare Pages.
+1. Criar páginas/rotas SEO para cada ferramenta.
+2. Adicionar metadados, sitemap e conteúdo explicativo para busca orgânica.
+3. Criar backend para consultas de rede que exigem acesso externo.
+4. Adicionar ferramentas avançadas de PowerShell, Linux e Zabbix.
+5. Publicar na Vercel ou Cloudflare Pages.
