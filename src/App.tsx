@@ -74,7 +74,7 @@ function Home({query,setQuery,tools,navigate}:{query:string,setQuery:(v:string)=
   </>
 }
 
-function ToolPage({id,back}:{id:ToolId,back:()=>void}) {
+function ToolPage({id,back}:{id:Exclude<ToolId,'home'>,back:()=>void}) {
   const data:any = {subnet:['Calculadora IPv4 / CIDR','Redes',Network],password:['Gerador de senhas','Segurança',KeyRound],json:['JSON Formatter','Desenvolvimento',FileJson],port:['Port Checker','Redes',Wifi]}[id]
   const Icon=data[2]
   return <section className="tool-page"><button className="back" onClick={back}><ArrowLeft size={17}/> Voltar</button><div className="tool-title"><div className="icon-box big"><Icon/></div><div><span className="tag">{data[1]}</span><h1>{data[0]}</h1></div></div>{id==='subnet'?<Subnet/>:id==='password'?<Password/>:id==='json'?<JsonTool/>:<PortTool/>}</section>
