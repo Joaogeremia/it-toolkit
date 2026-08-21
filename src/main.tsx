@@ -81,7 +81,23 @@ function AppShell() {
       }
     }
     document.addEventListener('click', onClick, true)
-    return () => document.removeEventListener('click', onClick, true)
+
+    // On a direct SEO URL, App starts on its home view. Activate the matching
+    // card once so the requested tool is displayed without changing the URL.
+    let openTimer: number | undefined
+    if (route.slug && route.slug !== 'pro') {
+      openTimer = window.setTimeout(() => {
+        const card = Array.from(document.querySelectorAll<HTMLElement>('.tool-card')).find(element => {
+          return element.querySelector('h3')?.textContent?.trim() === route.name
+        })
+        card?.click()
+      }, 0)
+    }
+
+    return () => {
+      document.removeEventListener('click', onClick, true)
+      if (openTimer) window.clearTimeout(openTimer)
+    }
   }, [path])
   return route.slug === 'pro' ? <ProPage /> : <App key={path} />
 }
