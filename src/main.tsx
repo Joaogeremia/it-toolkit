@@ -70,7 +70,9 @@ function AppShell() {
       const card = target.closest<HTMLElement>('.tool-card')
       const back = target.closest<HTMLElement>('.back')
       const brand = target.closest<HTMLElement>('.brand')
-      const navLink = target.closest<HTMLAnchorElement>('a[href="#ferramentas"], a[href="#pro"]')
+      const proLink = target.closest<HTMLAnchorElement>('a[href="#pro"]')
+      const navLink = target.closest<HTMLAnchorElement>('a[href="#ferramentas"]')
+      if (proLink) { event.preventDefault(); history.pushState({}, '', '/pro'); setPath('/pro'); window.scrollTo({ top: 0, behavior: 'smooth' }); return }
       if (back || brand || navLink) { event.preventDefault(); history.pushState({}, '', '/'); setPath('/'); return }
       if (card && card.tagName === 'BUTTON') {
         const name = card.querySelector('h3')?.textContent?.trim()
