@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import ProPage from './ProPage'
+import SeoFaq from './SeoFaq'
 import './styles.css'
 
 type RouteMeta = { slug: string; name: string; title: string; description: string }
@@ -81,25 +82,11 @@ function AppShell() {
       }
     }
     document.addEventListener('click', onClick, true)
-
-    // On a direct SEO URL, App starts on its home view. Activate the matching
-    // card once so the requested tool is displayed without changing the URL.
-    let openTimer: number | undefined
-    if (route.slug && route.slug !== 'pro') {
-      openTimer = window.setTimeout(() => {
-        const card = Array.from(document.querySelectorAll<HTMLElement>('.tool-card')).find(element => {
-          return element.querySelector('h3')?.textContent?.trim() === route.name
-        })
-        card?.click()
-      }, 0)
-    }
-
-    return () => {
-      document.removeEventListener('click', onClick, true)
-      if (openTimer) window.clearTimeout(openTimer)
-    }
+    return () => document.removeEventListener('click', onClick, true)
   }, [path])
-  return route.slug === 'pro' ? <ProPage /> : <App key={path} />
+  return route.slug === 'pro'
+    ? <ProPage />
+    : <><App key={path} /><SeoFaq slug={route.slug} /></>
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><AppShell /></React.StrictMode>)
